@@ -1,0 +1,70 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <link href="//www.site44.com/static/2/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="//www.site44.com/static/2/stylesheet.css" rel="stylesheet" />
+  <title>My Parse App</title>
+  <meta name="description" content="My Parse App">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.9.min.js"></script>
+</head>
+
+<body>
+
+  <h2>Whereabouts clock!</h2>
+  
+  <table class="table" id="displayTable" style="padding:200px">
+    <tr>
+      <th>Name</th>
+      <th>MDN</th>
+      <th>Last Known Location</th>
+    </tr>
+  </table>
+
+  <script type="text/javascript">
+
+    Parse.initialize("pfEiSCI4ppOnqN15QSu3zo55o8WK4X5WTsNWgmww", "kQDon7XBDaUCTS287PxCzJsooDTLo0w04Y9SCym5");
+
+    function fetchRow(result) {
+      var userGeoPoint = result.get("location");
+      pointsOfInterest.near("location", userGeoPoint);
+      pointsOfInterest.first({
+        success: function(locObj){
+          $('#displayTable > tbody:last').append('<tr>' +
+                                             '<td>' + 
+                                              result.attributes.name +
+                                             '</td>' + 
+                                             '<td>' +
+                                             result.attributes.mdn +
+                                             '</td>' +
+                                             '<td>' + 
+                                             locObj.get("name") +
+                                             '</td>' +
+                                             '</tr>');
+        },
+        error: function(error){
+          alert("things appear to have broken");
+        }
+      });
+    }
+    
+    var Family = Parse.Object.extend("Family");
+    var places;
+    var pointsOfInterest = new Parse.Query("PointsOfInterest");
+    var query = new Parse.Query("Family");
+    query.find({
+      success: function(results){
+        for (var i = 0 ; i < results.length ; i++) {
+          fetchRow(results[i]);
+        }
+      },
+      error: function(error){
+      }
+    })
+  </script>
+</body>
+
+</html>
